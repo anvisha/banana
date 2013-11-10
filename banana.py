@@ -3,6 +3,8 @@
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from contextlib import closing
+import twilio.twiml
+
 #configs
 DATABASE = '/tmp/banana.db'
 DEBUG = True
@@ -39,6 +41,12 @@ def teardown_request(exception):
 @app.route('/hello')
 def hello():
     return 'Hello World!'
+
+@app.route('/text', methods=['GET', 'POST'])
+def hello_text():
+    resp = twilio.twiml.Response()
+    resp.message("Hello, This is the banana phone!")
+    return str(resp)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
