@@ -5,6 +5,7 @@ from flask import Flask, request, session, g, redirect, url_for, abort, render_t
 from flask.ext.sqlalchemy import SQLAlchemy
 from contextlib import closing
 import twilio.twiml
+import parser
 
 #configs
 DATABASE = '/tmp/banana.db'
@@ -40,15 +41,31 @@ db = SQLAlchemy(app)
 #     if db is not None:
 #         db.close()
 
+
 #ROUTING
-@app.route('/hello')
+@app.route('/home')
+def home():
+    return "hello world"
+
+@app.route('/hello', methods=['GET', 'POST'])
 def hello():
-    return 'Hello World!'
+    resp = twilio.twiml.Response()
+    resp.message(message)
+    return str(resp)
 
 @app.route('/text', methods=['GET', 'POST'])
 def hello_text():
+    body = request.values.get('Body', None)
+    parsed = parser.sms_parser(body)
+    if parsed:
+        (user_phone, contact) = parsed
+        contact_phone = retrieve_phone(user_phone, contact)
+        message = contact_phone
+    else:
+        message = "Incorrect format. Please try again with <your number> <contact name> <pin>"
+    
     resp = twilio.twiml.Response()
-    resp.message("Hello, This is the banana phone!")
+    resp.message(message)
     return str(resp)
 
 #MODELS
@@ -80,6 +97,12 @@ class Contact(db.Model):
         self.name = name
         self.phone= phone
         self.user_id = user_id
+
+#TODO: THIS IS HELLA JANKY. fix
+def retrieve_phone(user_phone, contact_name):
+    user = User.query.filter_by(phone=user_phone).first()
+    contact = Contact.query.filter_by(name=contact_name, user_id= user.id).first()
+    return contact.phone
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
