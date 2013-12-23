@@ -2,6 +2,7 @@
 
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+from flask.ext.sqlalchemy import SQLAlchemy
 from contextlib import closing
 import twilio.twiml
 
@@ -15,27 +16,29 @@ PASSWORD = '12345'
 #creating app
 app = Flask(__name__)
 app.config.from_object(__name__)
-app.config.from_envvar('BANANA_SETTINGS', silent=True)
+#app.config.from_envvar('BANANA_SETTINGS', silent=True)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+db = SQLAlchemy(app)
 
 #database stuff
-def connect_db():
-    return sqlite3.connect(app.config['DATABASE'])
+# def connect_db():
+#     return sqlite3.connect(app.config['DATABASE'])
 
-def init_db():
-    with closing(connect_db()) as db:
-        with app.open_resource('schema.sql', mode='r') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
+# def init_db():
+#     with closing(connect_db()) as db:
+#         with app.open_resource('schema.sql', mode='r') as f:
+#             db.cursor().executescript(f.read())
+#         db.commit()
 
-@app.before_request
-def before_request():
-    g.db = connect_db()
+# @app.before_request
+# def before_request():
+#     g.db = connect_db()
 
-@app.teardown_request
-def teardown_request(exception):
-    db = getattr(g, 'db', None)
-    if db is not None:
-        db.close()
+# @app.teardown_request
+# def teardown_request(exception):
+#     db = getattr(g, 'db', None)
+#     if db is not None:
+#         db.close()
 
 #ROUTING
 @app.route('/hello')
@@ -47,6 +50,36 @@ def hello_text():
     resp = twilio.twiml.Response()
     resp.message("Hello, This is the banana phone!")
     return str(resp)
+
+#MODELS
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    phone = db.Column(db.Integer, unique=True)
+    username = db.Column(db.String(80), unique=True)
+    email = db.Column(db.String(120), unique=True)
+    contacts = db.relationship('Contact')
+
+    #TODO: Add password
+
+    def __init__(self, phone, username, email):
+        self.phone= phone
+        self.username = username
+        self.email = email
+
+    def __repr__(self):
+        return '<User %r>' % self.username
+
+class Contact(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80))
+    phone = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __init__(self, name, phone, user_id):
+        self.name = name
+        self.phone= phone
+        self.user_id = user_id
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
