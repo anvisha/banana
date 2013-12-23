@@ -60,7 +60,7 @@ def hello_text():
     if parsed:
         (user_phone, contact) = parsed
         contact_phone = retrieve_phone(user_phone, contact)
-        message = contact_phone
+        message = contact_phonel
     else:
         message = "Incorrect format. Please try again with <your number> <contact name> <pin>"
     
