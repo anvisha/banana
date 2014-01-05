@@ -48,7 +48,7 @@ def home():
     return "hello world"
 
 @app.route('/hello', methods=['GET', 'POST'])
-def hello():
+def banana():
     resp = twilio.twiml.Response()
     resp.message(message)
     return str(resp)
