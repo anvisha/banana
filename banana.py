@@ -3,6 +3,7 @@
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.heroku import Heroku #handles URL configs
 from contextlib import closing
 import twilio.twiml
 import parser
@@ -19,8 +20,9 @@ PASSWORD = '12345'
 app = Flask(__name__)
 app.config.from_object(__name__)
 #app.config.from_envvar('BANANA_SETTINGS', silent=True)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
+heroku = Heroku(app)
 
 #database stuff
 # def connect_db():
