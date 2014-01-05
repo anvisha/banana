@@ -60,6 +60,12 @@ def banana():
 @app.route('/text', methods=['GET', 'POST'])
 def hello_text():
     body = request.values.get('Body', None)
+    parsed = body.split()
+    try:
+        message = parsed[1]+ " " + str(retrieve_phone(parsed[0], parsed[1]))
+    except:
+        message = "error"
+
     # parsed = parser.sms_parser(body)
     # if parsed:
     #     (user_phone, contact) = parsed
@@ -67,7 +73,6 @@ def hello_text():
     #     message = contact_phonel
     # else:
     #     message = "Incorrect format. Please try again with <your number> <contact name> <pin>"
-    message = str(body)
     resp = twilio.twiml.Response()
     resp.message(message)
     return str(resp)
