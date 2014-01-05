@@ -7,6 +7,7 @@ Werkzeug==0.9.4
 gunicorn==18.0
 httplib2==0.8
 itsdangerous==0.23
+psycopg2==2.5.1
 six==1.4.1
 twilio==3.6.4
 unittest2==0.5.1
