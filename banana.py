@@ -18,7 +18,7 @@ PASSWORD = '12345'
 app = Flask(__name__)
 app.config.from_object(__name__)
 #app.config.from_envvar('BANANA_SETTINGS', silent=True)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 
 #database stuff
