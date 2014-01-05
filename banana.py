@@ -70,6 +70,10 @@ def hello_text():
     resp.message(message)
     return str(resp)
 
+@app.route('/test', methods=['GET','POST'])
+def blah():
+    return retrieve_phone(12345, 'mom')
+
 #MODELS
 
 class User(db.Model):
