@@ -10,7 +10,7 @@ import parser
 import os
 
 #configs
-DATABASE = '/tmp/banana.db'
+#DATABASE = '/tmp/banana.db'
 DEBUG = True
 SECRET_KEY = 'oscar and bambi'
 USERNAME = 'admin'
@@ -18,11 +18,11 @@ PASSWORD = '12345'
 
 #creating app
 app = Flask(__name__)
-app.config.from_object(__name__)
+#app.config.from_object(__name__)
 #app.config.from_envvar('BANANA_SETTINGS', silent=True)
-#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
-heroku = Heroku(app)
+#heroku = Heroku(app)
 
 #database stuff
 # def connect_db():
