@@ -74,8 +74,8 @@ def hello_text():
 
 @app.route('/test', methods=['GET','POST'])
 def blah():
-    user = User.query.all()[0]
-    return user.id, user.phone, user.contacts
+    user = User.query.all()[0].username
+    return user
 
 #MODELS
 
