@@ -6,6 +6,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from contextlib import closing
 import twilio.twiml
 import parser
+import os
 
 #configs
 DATABASE = '/tmp/banana.db'
