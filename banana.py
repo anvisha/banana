@@ -8,6 +8,7 @@ from contextlib import closing
 import twilio.twiml
 import parser
 import os
+from werkzeug.security import generate_password_hash, check_password_hash
 
 #configs
 #DATABASE = '/tmp/banana.db'
@@ -20,6 +21,9 @@ PASSWORD = '12345'
 app = Flask(__name__)
 #app.config.from_object(__name__)
 #app.config.from_envvar('BANANA_SETTINGS', silent=True)
+if not os.environ.has_key('DATABASE_URL'):
+    #TODO This is not working for some reason
+    os.environ['DATABASE_URL'] = 'postgresql://banana:banana@localhost:5432/bananatmp'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 #heroku = Heroku(app)
@@ -82,21 +86,26 @@ def blah():
     user = User.query.all()[0].username
     return user
 
-#MODELS
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    phone = db.Column(db.Integer, unique=True)
+    phone = db.Column(db.String(15), unique=True)
     username = db.Column(db.String(80), unique=True)
     email = db.Column(db.String(120), unique=True)
     contacts = db.relationship('Contact')
 
     #TODO: Add password
 
-    def __init__(self, phone, username, email):
+    def __init__(self, phone, username, password, email):
         self.phone= phone
         self.username = username
         self.email = email
+        self.set_password(password)
+
+    def set_password(self, password):
+        self.pw_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.pw_hash, password)
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -104,7 +113,7 @@ class User(db.Model):
 class Contact(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
-    phone = db.Column(db.Integer)
+    phone = db.Column(db.String(15)) 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __init__(self, name, phone, user_id):
